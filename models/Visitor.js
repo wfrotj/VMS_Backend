@@ -15,7 +15,13 @@ const visitorSchema = new mongoose.Schema({
   },
   purposeOfEntry: {
     type: String,
-    enum: ["interview", "meeting", "conference"],
+    enum: [
+      "enrollment",
+      "parents' meeting",
+      "inquiry",
+      "tuition fees",
+      "meeting with guindance",
+    ],
     required: true,
   },
 
