@@ -10,15 +10,23 @@ const getVisitors = async (req, res) => {
   }
 };
 
-async function createVisitor(req, res, next) {
+const createVisitor = async (req, res, next) => {
   try {
-    const { firstName, lastName, contactNumber, purposeOfEntry } = req.body;
+    const {
+      firstName,
+      lastName,
+      contactNumber,
+      purposeOfEntry,
+
+      timeExited,
+    } = req.body;
 
     if (
       firstName === undefined ||
       lastName === undefined ||
       contactNumber === undefined ||
-      purposeOfEntry === undefined
+      purposeOfEntry === undefined ||
+      timeExited === undefined
     )
       return res.status(400).json({ error: "Content is missing" });
 
@@ -32,6 +40,7 @@ async function createVisitor(req, res, next) {
       lastName,
       contactNumber,
       purposeOfEntry,
+      timeExited,
     });
 
     const savedVisitor = await visitor.save();
@@ -40,7 +49,7 @@ async function createVisitor(req, res, next) {
   } catch (error) {
     next(error);
   }
-}
+};
 
 const getVisitorsByDate = async (req, res) => {
   try {
@@ -67,9 +76,37 @@ const getVisitorsByDate = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
+const getVisitorsByPurpose = async (req, res) => {
+  try {
+    const { purpose } = req.query;
+
+    // Check if the purpose is valid
+    const validPurposes = [
+      "enrollment",
+      "meeting",
+      "inquiry",
+      "payments",
+      "seminar",
+    ];
+    if (!validPurposes.includes(purpose)) {
+      return res.status(400).json({ message: "Invalid purpose of entry" });
+    }
+
+    // Perform the database query to find visitors by purpose
+    const visitors = await Visitor.find({ purposeOfEntry: purpose });
+
+    // Return the visitors as the response
+    res.json(visitors);
+  } catch (error) {
+    // Handle any errors that occur during the process
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
 export default {
   getVisitors,
   createVisitor,
   getVisitorsByDate,
+  getVisitorsByPurpose,
 };
