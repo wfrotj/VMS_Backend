@@ -10,46 +10,45 @@ const getVisitors = async (req, res) => {
   }
 };
 
-const createVisitor = async (req, res, next) => {
-  try {
-    const {
-      firstName,
-      lastName,
-      contactNumber,
-      purposeOfEntry,
+// const createVisitor = async (req, res, next) => {
+//   try {
+//     const { firstName, lastName, contactNumber, purposeOfEntry, timeExited } =
+//       req.body;
 
-      timeExited,
-    } = req.body;
+//     if (
+//       firstName === undefined ||
+//       lastName === undefined ||
+//       contactNumber === undefined ||
+//       purposeOfEntry === undefined ||
+//       timeExited === undefined
+//     ) {
+//       return res.status(400).json({ error: "Content is missing" });
+//     }
 
-    if (
-      firstName === undefined ||
-      lastName === undefined ||
-      contactNumber === undefined ||
-      purposeOfEntry === undefined ||
-      timeExited === undefined
-    )
-      return res.status(400).json({ error: "Content is missing" });
+//     const visitorExists = await Visitor.findOne({ firstName, lastName });
 
-    const visitorExists = await Visitor.findOne({ firstName, lastName });
+//     if (visitorExists) {
+//       return res.status(400).json({ error: "Visitor already exists" });
+//     }
 
-    if (visitorExists)
-      return res.status(400).json({ error: "Visitor already exists" });
+//     const dateVisited = new Date(); // Set dateVisited to the current date
 
-    const visitor = new Visitor({
-      firstName,
-      lastName,
-      contactNumber,
-      purposeOfEntry,
-      timeExited,
-    });
+//     const visitor = new Visitor({
+//       firstName,
+//       lastName,
+//       contactNumber,
+//       purposeOfEntry,
+//       dateVisited,
+//       timeExited,
+//     });
 
-    const savedVisitor = await visitor.save();
+//     const savedVisitor = await visitor.save();
 
-    return res.status(201).json(savedVisitor);
-  } catch (error) {
-    next(error);
-  }
-};
+//     return res.status(201).json(savedVisitor);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
 const getVisitorsByDate = async (req, res) => {
   try {
@@ -76,31 +75,61 @@ const getVisitorsByDate = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
-const getVisitorsByPurpose = async (req, res) => {
-  try {
-    const { purpose } = req.query;
 
-    // Check if the purpose is valid
-    const validPurposes = [
-      "enrollment",
-      "meeting",
-      "inquiry",
-      "payments",
-      "seminar",
-    ];
-    if (!validPurposes.includes(purpose)) {
-      return res.status(400).json({ message: "Invalid purpose of entry" });
+const createVisitor = async (req, res, next) => {
+  try {
+    const {
+      firstName,
+      lastName,
+      contactNumber,
+      purposeOfEntry,
+      timeExited,
+      timeVisited,
+    } = req.body;
+
+    if (
+      firstName === undefined ||
+      lastName === undefined ||
+      contactNumber === undefined ||
+      purposeOfEntry === undefined
+    ) {
+      return res.status(400).json({ error: "Content is missing" });
     }
 
-    // Perform the database query to find visitors by purpose
-    const visitors = await Visitor.find({ purposeOfEntry: purpose });
+    const visitorExists = await Visitor.findOne({ firstName, lastName });
 
-    // Return the visitors as the response
-    res.json(visitors);
+    if (visitorExists) {
+      return res.status(400).json({ error: "Visitor already exists" });
+    }
+
+    // const dateVisited = new Date(); // Set dateVisited to the current date
+
+    const visitor = new Visitor({
+      firstName,
+      lastName,
+      contactNumber,
+      purposeOfEntry,
+      timeVisited,
+      timeExited,
+    });
+
+    const savedVisitor = await visitor.save();
+
+    return res.status(201).json(savedVisitor);
   } catch (error) {
-    // Handle any errors that occur during the process
-    console.error(error);
-    res.status(500).json({ message: "Internal Server Error" });
+    next(error);
+  }
+};
+
+const getVisitorsByPurpose = async (req, res) => {
+  try {
+    const purpose = req.params.purposeOfEntry;
+
+    const visitors = await Visitor.find({});
+
+    res.status(201).json(visitors);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
 
