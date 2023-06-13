@@ -10,46 +10,6 @@ const getVisitors = async (req, res) => {
   }
 };
 
-// const createVisitor = async (req, res, next) => {
-//   try {
-//     const { firstName, lastName, contactNumber, purposeOfEntry, timeExited } =
-//       req.body;
-
-//     if (
-//       firstName === undefined ||
-//       lastName === undefined ||
-//       contactNumber === undefined ||
-//       purposeOfEntry === undefined ||
-//       timeExited === undefined
-//     ) {
-//       return res.status(400).json({ error: "Content is missing" });
-//     }
-
-//     const visitorExists = await Visitor.findOne({ firstName, lastName });
-
-//     if (visitorExists) {
-//       return res.status(400).json({ error: "Visitor already exists" });
-//     }
-
-//     const dateVisited = new Date(); // Set dateVisited to the current date
-
-//     const visitor = new Visitor({
-//       firstName,
-//       lastName,
-//       contactNumber,
-//       purposeOfEntry,
-//       dateVisited,
-//       timeExited,
-//     });
-
-//     const savedVisitor = await visitor.save();
-
-//     return res.status(201).json(savedVisitor);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
 const getVisitorsByDate = async (req, res) => {
   try {
     const { dateVisited } = req.params;
@@ -83,15 +43,15 @@ const createVisitor = async (req, res, next) => {
       lastName,
       contactNumber,
       purposeOfEntry,
-      timeExited,
-      timeVisited,
+      visitorIdNumber,
     } = req.body;
 
     if (
       firstName === undefined ||
       lastName === undefined ||
       contactNumber === undefined ||
-      purposeOfEntry === undefined
+      purposeOfEntry === undefined ||
+      visitorIdNumber === undefined
     ) {
       return res.status(400).json({ error: "Content is missing" });
     }
@@ -109,8 +69,7 @@ const createVisitor = async (req, res, next) => {
       lastName,
       contactNumber,
       purposeOfEntry,
-      timeVisited,
-      timeExited,
+      visitorIdNumber,
     });
 
     const savedVisitor = await visitor.save();
@@ -123,13 +82,23 @@ const createVisitor = async (req, res, next) => {
 
 const getVisitorsByPurpose = async (req, res) => {
   try {
-    const purpose = req.params.purposeOfEntry;
+    const { purposeOfEntry } = req.params;
+    const visitors = await Visitor.find({ purposeOfEntry }); // Example database query
 
-    const visitors = await Visitor.find({});
-
-    res.status(201).json(visitors);
+    res.json(visitors);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+const exitVisitor = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const visitor = await Visitor.findByIdAndUpdate(id, req.body);
+    const updatedVisitor = await Visitor.findById(id);
+    res.status(200).json(updatedVisitor);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
@@ -138,4 +107,5 @@ export default {
   createVisitor,
   getVisitorsByDate,
   getVisitorsByPurpose,
+  exitVisitor,
 };

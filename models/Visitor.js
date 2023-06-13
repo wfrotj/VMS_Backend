@@ -19,20 +19,30 @@ const visitorSchema = new mongoose.Schema(
       enum: ["enrollment", "meeting", "inquiry", "payments", "seminar"],
       required: true,
     },
-    // dateVisited: {
-    //   type: Date,
-    //   default: Date.now,
-    // }, //real time
-    // timeVisited: {
-    //   type: String,
-    //   default: Date.now,
-    // },
-    // timeExited: {
-    //   type: String,
-    // },
+    visitorIdNumber: {
+      type: String,
+      required: true,
+    },
+    returnedId: {
+      type: Boolean,
+      default: false,
+    },
+    dateVisited: {
+      type: Date,
+      default: Date.now,
+    },
+    timeVisited: {
+      type: String,
+      default: function () {
+        return new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      },
+    },
   },
   {
-    timestamps: true,
+    timestamps: { createdAt: false },
   }
 );
 
@@ -41,16 +51,14 @@ visitorSchema.set("toJSON", {
     returnedObject.id = returnedObject._id;
     delete returnedObject._id;
     delete returnedObject.__v;
-
-    // Format the dateVisited field to display only the date
-    if (returnedObject.dateVisited) {
-      returnedObject.dateVisited = returnedObject.dateVisited
-        .toISOString()
-        .split("T")[0];
-    }
+    returnedObject.dateVisited = returnedObject.dateVisited
+      .toISOString()
+      .split("T")[0];
+    returnedObject.updatedAt = new Date(
+      returnedObject.updatedAt
+    ).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   },
 });
-
 const Visitor = mongoose.model("Visitor", visitorSchema);
 
 export default Visitor;

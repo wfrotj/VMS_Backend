@@ -5,6 +5,8 @@ const visitorRouter = express.Router();
 visitorRouter.get("/", visitorController.getVisitors);
 visitorRouter.get("/:dateVisited", visitorController.getVisitorsByDate);
 visitorRouter.get("/:purposeOfEntry", visitorController.getVisitorsByPurpose);
+
+visitorRouter.put("/:id", visitorController.exitVisitor);
 visitorRouter.post("/", visitorController.createVisitor);
 
 export default visitorRouter;
