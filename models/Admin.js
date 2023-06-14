@@ -5,16 +5,27 @@ const adminSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
+    unique: true,
   },
   name: {
     type: String,
     required: true,
   },
-  passwordHash: {
+  employeeNumber: {
     type: String,
-    minlength: 8,
     required: true,
   },
+  passwordHash: {
+    type: String,
+    minlength: 4,
+    required: true,
+  },
+  visitors: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Visitor",
+    },
+  ],
 });
 adminSchema.plugin(uniqueValidator);
 

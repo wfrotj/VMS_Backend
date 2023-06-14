@@ -40,6 +40,10 @@ const visitorSchema = new mongoose.Schema(
         });
       },
     },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Admin",
+    },
   },
   {
     timestamps: { createdAt: false },
