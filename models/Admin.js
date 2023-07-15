@@ -1,32 +1,19 @@
+/* eslint-disable linebreak-style */
 import mongoose from "mongoose";
 import uniqueValidator from "mongoose-unique-validator";
 
-const adminSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  name: {
-    type: String,
-    required: true,
-  },
-  employeeNumber: {
-    type: String,
-    required: true,
-  },
-  passwordHash: {
-    type: String,
-    minlength: 4,
-    required: true,
-  },
-  visitors: [
+const adminSchema = mongoose.Schema({
+  username: String,
+  name: String,
+  passwordHash: String,
+  users: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Visitor",
+      ref: "User",
     },
   ],
 });
+
 adminSchema.plugin(uniqueValidator);
 
 adminSchema.set("toJSON", {
